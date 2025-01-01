@@ -1,0 +1,11 @@
+asgiref==3.8.1
+cffi==1.17.1
+cryptography==44.0.0
+Django==5.1.4
+django-js-asset==3.0.1
+django-mptt==0.16.0
+mysqlclient==2.2.6
+pycparser==2.22
+ruff==0.8.4
+sqlparse==0.5.3
+uv==0.5.13
