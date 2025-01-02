@@ -9,14 +9,17 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
 
-
 class Folder(MPTTModel):
     name = models.CharField(max_length=100)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    parent = TreeForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children"
+    )
+
 
 class Item(models.Model):
     folder = TreeForeignKey(Folder, on_delete=models.CASCADE)
     # permission fields
+
 
 class Api(models.Model):
     increment_id = models.AutoField(primary_key=True)
@@ -573,67 +576,72 @@ class Tokens(models.Model):
         db_table = "tokens"
 
 
-class Users(models.Model):
+class User(models.Model):
     login = models.CharField(unique=True, max_length=500)
-    pw = models.CharField(max_length=400)
-    groupes_visibles = models.CharField(max_length=1000)
+    password = models.CharField(max_length=400)  # Renamed from 'pw' for clarity
+    visible_groups = models.CharField(max_length=1000)
     derniers = models.TextField(blank=True, null=True)
-    key_tempo = models.CharField(max_length=100, blank=True, null=True)
-    last_pw_change = models.CharField(max_length=30, blank=True, null=True)
-    last_pw = models.TextField(blank=True, null=True)
-    admin = models.IntegerField()
+    tempo_key = models.CharField(max_length=100, blank=True, null=True)
+    last_password_change = models.CharField(max_length=30, blank=True, null=True)
+    last_password = models.TextField(blank=True, null=True)
+    is_admin = models.IntegerField()
     fonction_id = models.CharField(max_length=1000, blank=True, null=True)
-    groupes_interdits = models.CharField(max_length=1000, blank=True, null=True)
-    last_connexion = models.CharField(max_length=30, blank=True, null=True)
-    gestionnaire = models.IntegerField()
-    email = models.CharField(max_length=300)
-    favourites = models.CharField(max_length=1000, blank=True, null=True)
+    forbidden_groups = models.CharField(max_length=1000, blank=True, null=True)
+    last_connection = models.CharField(max_length=30, blank=True, null=True)
+    user_manager = models.IntegerField()
+    email = models.EmailField()  # Changed to EmailField for validation
+    favorites = models.CharField(max_length=1000, blank=True, null=True)
     latest_items = models.CharField(max_length=1000, blank=True, null=True)
     personal_folder = models.IntegerField()
-    disabled = models.IntegerField()
+    is_disabled = models.BooleanField(default=False)  # Renamed and made BooleanField
     no_bad_attempts = models.IntegerField()
-    can_create_root_folder = models.IntegerField()
-    read_only = models.IntegerField()
-    timestamp = models.CharField(max_length=30)
+    can_create_root_folder = models.BooleanField(default=False)
+    read_only = models.BooleanField(default=False)
+    timestamp = (
+        models.DateTimeField()
+    )  # Changed to DateTimeField for better data type handling
     user_language = models.CharField(max_length=50)
     name = models.CharField(max_length=100, blank=True, null=True)
-    lastname = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
     session_end = models.CharField(max_length=30, blank=True, null=True)
-    isadministratedbyrole = models.IntegerField(
-        db_column="isAdministratedByRole"
-    )  # Field name made lowercase.
+    is_administrated_by_role = models.IntegerField(db_column="isAdministratedByRole")
     psk = models.CharField(max_length=400, blank=True, null=True)
     ga = models.CharField(max_length=50, blank=True, null=True)
     ga_temporary_code = models.CharField(max_length=20)
     avatar = models.CharField(max_length=1000, blank=True, null=True)
     avatar_thumb = models.CharField(max_length=1000, blank=True, null=True)
     upgrade_needed = models.IntegerField()
-    treeloadstrategy = models.CharField(max_length=30)
-    can_manage_all_users = models.IntegerField()
-    usertimezone = models.CharField(max_length=50)
-    agses_usercardid = models.CharField(
-        db_column="agses-usercardid", max_length=50
-    )  # Field renamed to remove unsuitable characters.
+    tree_load_strategy = models.CharField(max_length=30)
+    can_manage_all_users = models.BooleanField(default=False)
+    user_time_zone = models.CharField(max_length=50)
+    agses_user_card_id = models.CharField(db_column="agses-usercardid", max_length=50)
     encrypted_psk = models.TextField(blank=True, null=True)
-    user_ip = models.CharField(max_length=400)
-    user_ip_lastdate = models.CharField(max_length=50, blank=True, null=True)
+    user_ip = (
+        models.GenericIPAddressField()
+    )  # Changed to GenericIPAddressField for better validation
+    user_ip_last_date = models.CharField(max_length=50, blank=True, null=True)
     yubico_user_key = models.CharField(max_length=100)
     yubico_user_id = models.CharField(max_length=100)
     public_key = models.TextField(blank=True, null=True)
     private_key = models.TextField(blank=True, null=True)
     special = models.CharField(max_length=250)
     auth_type = models.CharField(max_length=200)
-    is_ready_for_usage = models.IntegerField()
-    otp_provided = models.IntegerField()
+    is_ready_for_usage = models.BooleanField(default=False)
+    otp_provided = models.BooleanField(default=False)
     roles_from_ad_groups = models.CharField(max_length=1000, blank=True, null=True)
     ongoing_process_id = models.CharField(max_length=100, blank=True, null=True)
     mfa_enabled = models.IntegerField()
-    created_at = models.CharField(max_length=30, blank=True, null=True)
-    updated_at = models.CharField(max_length=30, blank=True, null=True)
-    deleted_at = models.CharField(max_length=30, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
     keys_recovery_time = models.CharField(max_length=500, blank=True, null=True)
     aes_iv = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = "users"
+
+
+# Define a String method to make model strings human-readable
+def __str__(self):
+    return f"User {self.login}"
