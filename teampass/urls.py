@@ -26,6 +26,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # Authentication URLs
     path("accounts/", include("django.contrib.auth.urls")),
+    path('login/', views.user_login, name='user_login'),
+    path('logout/', views.user_logout, name='user_logout'),
     # App-specific URLs
     path("", views.home, name="home"),
     path("items/", views.item_list, name="item_list"),
@@ -40,6 +42,8 @@ urlpatterns = [
     path("folders/<int:pk>/edit/", views.folder_update, name="folder_update"),
     path("folders/<int:pk>/delete/", views.folder_delete, name="folder_delete"),
     # User URLs
+    path('register/', views.user_register, name='user_register'),
+    path('profile/', views.user_profile, name='user_profile'),
     path("users/", views.user_list, name="user_list"),
     path("users/<int:pk>/", views.user_detail, name="user_detail"),
     path("users/new/", views.user_create, name="user_create"),
