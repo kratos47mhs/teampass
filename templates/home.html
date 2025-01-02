@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - TeamPass{% endblock %}
+
+{% block content %}
+    <h1>Welcome to TeamPass</h1>
+    <p>Your secure password manager.</p>
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}!</p>
+    {% else %}
+        <p>Please <a href="{% url 'user_login' %}">login</a> or <a href="{% url 'user_register' %}">register</a> to get started.</p>
+    {% endif %}
+{% endblock %}

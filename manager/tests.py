@@ -1,6 +1,6 @@
 # tests.py
 from django.test import TestCase
-from .models import Item
+from manager.models.models import Item
 
 class ItemTestCase(TestCase):
     def setUp(self):
