@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ folder.title }} - TeamPass{% endblock %}
+
+{% block content %}
+    <h1>{{ folder.title }}</h1>
+    <p>Parent: {{ folder.parent.title }}</p>
+    <a href="{% url 'folder_update' folder.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'folder_delete' folder.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'folder_list' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}

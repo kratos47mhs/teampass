@@ -49,6 +49,8 @@ urlpatterns = [
     path("users/new/", views.user_create, name="user_create"),
     path("users/<int:pk>/edit/", views.user_update, name="user_update"),
     path("users/<int:pk>/delete/", views.user_delete, name="user_delete"),
+    path('users/<int:pk>/edit/', views.user_update, name='user_update'),
+
     # API URLs
     path("api/", include("manager.api.urls")),  # Assuming you have an API app
 ]

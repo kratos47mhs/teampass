@@ -15,6 +15,7 @@ def home(request):
 @login_required
 def item_list(request):
     items = Item.objects.filter(user=request.user)
+    folders = Folder.objects.filter(user=request.user)
     return render(request, "item_list.html", {"items": items})
 
 
@@ -136,15 +137,15 @@ def user_create(request):
 
 @login_required
 def user_update(request, pk):
-    user = get_object_or_404(CustomUser, pk=pk)
-    if request.method == "POST":
+    user = get_object_or_404(CustomUser, pk=pk)  # Retrieve the user or return a 404 error
+    if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect("user_detail", pk=user.pk)
+            return redirect('user_detail', pk=user.pk)
     else:
         form = CustomUserCreationForm(instance=user)
-    return render(request, "user_form.html", {"form": form})
+    return render(request, 'user_form.html', {'form': form})
 
 
 @login_required

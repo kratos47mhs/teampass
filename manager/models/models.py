@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 import jsonfield
 
 
@@ -131,6 +132,7 @@ class Item(models.Model):
     created_at = models.CharField(max_length=30, null=True)
     updated_at = models.CharField(max_length=30, null=True)
     deleted_at = models.CharField(max_length=30, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = "items"
@@ -332,6 +334,7 @@ class Folder(models.Model):
     nb_items_in_folder = models.IntegerField(default=0)
     nb_subfolders = models.IntegerField(default=0)
     nb_items_in_subfolders = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = "nested_tree"
