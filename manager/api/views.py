@@ -1,6 +1,5 @@
 from rest_framework import generics
-from manager.models.models import Item, Folder
-from manager.models.user import CustomUser
+from manager.models import Item, Folder,CustomUser
 from .serializers import ItemSerializer, FolderSerializer, UserSerializer
 
 class ItemList(generics.ListCreateAPIView):

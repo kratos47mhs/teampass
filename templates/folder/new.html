@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Folder</title>
+</head>
+<body>
+    <h1>Create New Folder</h1>
+    <form method="post" action="{% url 'manager:folder_new' %}">
+        {% csrf_token %}
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="parent_id">Parent Folder:</label>
+        <select id="parent_id" name="parent_id">
+            <option value="">None</option>
+            {% for folder in folders %}
+                <option value="{{ folder.id }}">{{ folder.title }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit">Create Folder</button>
+    </form>
+</body>
+</html>

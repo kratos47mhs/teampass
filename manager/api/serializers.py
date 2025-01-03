@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from manager.models.models import Item, Folder
-from manager.models.user import CustomUser
+from manager.models import Item, Folder,CustomUser
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,26 +1,10 @@
 from django.contrib import admin
-from manager.models.user import CustomUser
-from manager.models.models import (
-    API,
-    DeletionConfiguration,
+from manager.models import (
+
     Category,
-    CategoryFolder,
-    CategoryItem,
-    DefusePassword,
-    Email,
-    Export,
     File,
     Item,
-    ItemChange,
-    ItemEdition,
-    KBCategory,
-    KB,
-    KBItem,
-    Language,
-    LDAPGroupRole,
-    ItemLog,
     SystemLog,
-    Misc,
     Folder,
     Notification,
     OTV,
@@ -28,41 +12,23 @@ from manager.models.models import (
     ProcessLog,
     ProcessTask,
     RestrictionToRole,
-    Right,
     RoleTitle,
     RoleValue,
     ShareKeyField,
     ShareKeyFile,
-    ShareKeyItem,
-    ShareKeyLog,
-    ShareKeySuggestion,
     Suggestion,
+    CustomUser,
     Tag,
     Template,
     Token,
 )
 
 # Register models with default admin options
-admin.site.register(API)
-admin.site.register(DeletionConfiguration)
+
 admin.site.register(Category)
-admin.site.register(CategoryFolder)
-admin.site.register(CategoryItem)
-admin.site.register(DefusePassword)
-admin.site.register(Email)
-admin.site.register(Export)
 admin.site.register(File)
 admin.site.register(Item)
-admin.site.register(ItemChange)
-admin.site.register(ItemEdition)
-admin.site.register(KBCategory)
-admin.site.register(KB)
-admin.site.register(KBItem)
-admin.site.register(Language)
-admin.site.register(LDAPGroupRole)
-admin.site.register(ItemLog)
 admin.site.register(SystemLog)
-admin.site.register(Misc)
 admin.site.register(Folder)
 admin.site.register(Notification)
 admin.site.register(OTV)
@@ -70,14 +36,10 @@ admin.site.register(Process)
 admin.site.register(ProcessLog)
 admin.site.register(ProcessTask)
 admin.site.register(RestrictionToRole)
-admin.site.register(Right)
 admin.site.register(RoleTitle)
 admin.site.register(RoleValue)
 admin.site.register(ShareKeyField)
 admin.site.register(ShareKeyFile)
-admin.site.register(ShareKeyItem)
-admin.site.register(ShareKeyLog)
-admin.site.register(ShareKeySuggestion)
 admin.site.register(Suggestion)
 admin.site.register(Tag)
 admin.site.register(Template)

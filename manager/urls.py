@@ -1,6 +1,9 @@
 from django.urls import path
-from . import views
+from .views import FolderCreateView, FolderList
+
+app_name = "manager"
 
 urlpatterns = [
-    path('item/', views.item_list, name='item_list'),
+    path("folders/", FolderList.as_view(), name="folder_list"),
+    path("new/", FolderCreateView.as_view(), name="folder_new"),
 ]

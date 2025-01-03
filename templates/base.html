@@ -21,10 +21,10 @@
         <ul class="navbar-nav ml-auto">
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'item_list' %}">Items</a>
+                    <a class="nav-link" href="{% url 'item_list' %}">Item</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'folder_list' %}">Folders</a>
+                    <a class="nav-link" href="{% url 'folder_list' %}">Folder</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'user_profile' %}">Profile</a>  <!-- Ensure this is correct -->
