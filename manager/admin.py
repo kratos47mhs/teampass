@@ -1,19 +1,50 @@
 from django.contrib import admin
+from manager.models.user import CustomUser
 from manager.models.models import (
-    API, DeletionConfiguration, CacheEntry, CacheTree, Category,
-    CategoryFolder, CategoryItem, DefusePassword, Email, Export, File,
-    Item, ItemChange, ItemEdition, KBCategory, KB, KBItem, Language,
-    LDAPGroupRole, ItemLog, SystemLog, Misc, Folder, Notification, OTV,
-    Process, ProcessLog, ProcessTask, RestrictionToRole, Right, RoleTitle,
-    RoleValue, ShareKeyField, ShareKeyFile, ShareKeyItem, ShareKeyLog,
-    ShareKeySuggestion, Suggestion, Tag, Template, Token, CustomUser
+    API,
+    DeletionConfiguration,
+    Category,
+    CategoryFolder,
+    CategoryItem,
+    DefusePassword,
+    Email,
+    Export,
+    File,
+    Item,
+    ItemChange,
+    ItemEdition,
+    KBCategory,
+    KB,
+    KBItem,
+    Language,
+    LDAPGroupRole,
+    ItemLog,
+    SystemLog,
+    Misc,
+    Folder,
+    Notification,
+    OTV,
+    Process,
+    ProcessLog,
+    ProcessTask,
+    RestrictionToRole,
+    Right,
+    RoleTitle,
+    RoleValue,
+    ShareKeyField,
+    ShareKeyFile,
+    ShareKeyItem,
+    ShareKeyLog,
+    ShareKeySuggestion,
+    Suggestion,
+    Tag,
+    Template,
+    Token,
 )
 
 # Register models with default admin options
 admin.site.register(API)
 admin.site.register(DeletionConfiguration)
-admin.site.register(CacheEntry)
-admin.site.register(CacheTree)
 admin.site.register(Category)
 admin.site.register(CategoryFolder)
 admin.site.register(CategoryItem)

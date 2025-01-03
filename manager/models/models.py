@@ -1,6 +1,31 @@
+from django.utils.timezone import now
 from django.db import models
-from django.contrib.auth.models import User
+
+# from django.core.files import File
+from manager.models.user import CustomUser
+
 import jsonfield
+
+
+class Folder(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    parent = models.ForeignKey(
+        "self", related_name="children", on_delete=models.CASCADE, null=True, blank=True
+    )
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, default=1
+    )  # Assuming 1 is a valid user ID
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(default=now, editable=False)
+
+    class Meta:
+        db_table = "folders"
+        verbose_name = "Folder"
+        verbose_name_plural = "Folders"
+
+    def __str__(self):
+        return self.title
 
 
 class API(models.Model):
@@ -9,7 +34,7 @@ class API(models.Model):
     label = models.CharField(max_length=255, null=True)
     value = models.TextField(null=True)
     timestamp = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = "api"
@@ -23,39 +48,6 @@ class DeletionConfiguration(models.Model):
 
     class Meta:
         db_table = "automatic_del"
-
-
-class CacheEntry(models.Model):
-    increment_id = models.AutoField(primary_key=True)
-    id = models.IntegerField()
-    label = models.CharField(max_length=500)
-    description = models.TextField(null=True)
-    tags = models.TextField(null=True)
-    id_tree = models.IntegerField()
-    perso = models.BooleanField()
-    restricted_to = models.CharField(max_length=200, null=True)
-    login = models.TextField(null=True)
-    folder = models.TextField()
-    author = models.CharField(max_length=50)
-    renewal_period = models.SmallIntegerField(default=0)
-    timestamp = models.CharField(max_length=50, null=True)
-    url = models.TextField(null=True)
-    encryption_type = models.CharField(max_length=50, default="0")
-
-    class Meta:
-        db_table = "cache"
-
-
-class CacheTree(models.Model):
-    increment_id = models.AutoField(primary_key=True)
-    data = jsonfield.JSONField(null=True)
-    visible_folders = models.TextField()
-    timestamp = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    folders = jsonfield.JSONField(null=True)
-
-    class Meta:
-        db_table = "cache_tree"
 
 
 class Category(models.Model):
@@ -100,43 +92,51 @@ class CategoryItem(models.Model):
         db_table = "categories_items"
 
 
-# Continue defining other models similarly...
+class Password(models.Model):
+    id = models.AutoField(primary_key=True)
+    label = models.CharField(max_length=255)
+    login = models.CharField(max_length=255)
+    encrypted_password = models.TextField()
+    password_iv = models.TextField()
+    encryption_type = models.CharField(max_length=50, default="AES")
+    url = models.URLField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="passwords"
+    )
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        db_table = "passwords"
+        verbose_name = "Password"
+        verbose_name_plural = "Passwords"
+
+    def __str__(self):
+        return self.label
 
 
 class Item(models.Model):
     id = models.AutoField(primary_key=True)
-    label = models.CharField(max_length=500)
-    description = models.TextField(null=True)
-    pw = models.TextField(null=True)
-    pw_iv = models.TextField(null=True)
-    pw_len = models.IntegerField(default=0)
-    url = models.TextField(null=True)
-    id_tree = models.CharField(max_length=10, null=True)
-    perso = models.BooleanField(default=False)
-    login = models.CharField(max_length=200, null=True)
-    inactif = models.BooleanField(default=False)
-    restricted_to = models.CharField(max_length=200, null=True)
-    anyone_can_modify = models.BooleanField(default=False)
-    email = models.CharField(max_length=100, null=True)
-    notification = models.CharField(max_length=250, null=True)
-    viewed_no = models.IntegerField(default=0)
-    complexity_level = models.CharField(max_length=3, default="-1")
-    auto_update_pwd_frequency = models.SmallIntegerField(default=0)
-    auto_update_pwd_next_date = models.CharField(max_length=100, default="0")
-    encryption_type = models.CharField(max_length=20, default="not_set")
-    folder = models.ForeignKey("Folder", on_delete=models.CASCADE)
-    fa_icon = models.CharField(max_length=100, null=True)
-    item_key = models.CharField(max_length=500, default="-1")
-    created_at = models.CharField(max_length=30, null=True)
-    updated_at = models.CharField(max_length=30, null=True)
-    deleted_at = models.CharField(max_length=30, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    label = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    encrypted_password = models.TextField(default="default_encrypted_password")
+    password_iv = models.TextField(default="default_password_iv")
+    encryption_type = models.CharField(max_length=50, default="AES")
+    url = models.URLField(null=True, blank=True)
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(default=now, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="item", default=1)  # Assuming 1 is a valid user ID
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = "items"
+        verbose_name = "Item"
+        verbose_name_plural = "Items"
 
-
-# Continuing from the previous models...
+    def __str__(self):
+        return self.label
 
 
 class DefusePassword(models.Model):
@@ -189,7 +189,6 @@ class File(models.Model):
     size = models.IntegerField()
     extension = models.CharField(max_length=10)
     type = models.CharField(max_length=255)
-    file = models.CharField(max_length=50)
     status = models.CharField(max_length=50, default="0")
     content = models.BinaryField(null=True)
     confirmed = models.IntegerField(default=0)
@@ -209,7 +208,7 @@ class ItemChange(models.Model):
     description = models.TextField()
     comment = models.TextField()
     folder = models.ForeignKey("Folder", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.CharField(max_length=50, default="none")
 
     class Meta:
@@ -219,7 +218,7 @@ class ItemChange(models.Model):
 class ItemEdition(models.Model):
     increment_id = models.AutoField(primary_key=True)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.CharField(max_length=50)
 
     class Meta:
@@ -239,7 +238,7 @@ class KB(models.Model):
     category = models.ForeignKey(KBCategory, on_delete=models.CASCADE)
     label = models.CharField(max_length=200)
     description = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     anyone_can_modify = models.BooleanField(default=False)
 
     class Meta:
@@ -281,7 +280,7 @@ class ItemLog(models.Model):
     increment_id = models.AutoField(primary_key=True)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
     date = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     action = models.CharField(max_length=250, null=True)
     reason = models.TextField(null=True)
     old_value = models.TextField(null=True)
@@ -313,37 +312,12 @@ class Misc(models.Model):
         db_table = "misc"
 
 
-class Folder(models.Model):
-    id = models.AutoField(primary_key=True)
-    parent = models.ForeignKey(
-        "self", related_name="children", on_delete=models.CASCADE
-    )
-    title = models.CharField(max_length=255)
-    nleft = models.IntegerField(default=0)
-    nright = models.IntegerField(default=0)
-    nlevel = models.IntegerField(default=0)
-    bloquer_creation = models.BooleanField(default=False)
-    bloquer_modification = models.BooleanField(default=False)
-    personal_folder = models.BooleanField(default=False)
-    renewal_period = models.IntegerField(default=0)
-    fa_icon = models.CharField(max_length=100, default="fas fa-folder")
-    fa_icon_selected = models.CharField(max_length=100, default="fas fa-folder-open")
-    categories = jsonfield.JSONField()
-    nb_items_in_folder = models.IntegerField(default=0)
-    nb_subfolders = models.IntegerField(default=0)
-    nb_items_in_subfolders = models.IntegerField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        db_table = "nested_tree"
-
-
 class Notification(models.Model):
     increment_id = models.AutoField(primary_key=True)
     item = models.ForeignKey(
         "Item", on_delete=models.CASCADE, related_name="notifications"
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "notification"
@@ -354,7 +328,7 @@ class OTV(models.Model):
     timestamp = models.CharField(max_length=100)
     code = models.CharField(max_length=100)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    originator = models.ForeignKey(User, on_delete=models.CASCADE)
+    originator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     encrypted = models.TextField()
     views = models.IntegerField(default=0)
     max_views = models.IntegerField(null=True)
@@ -367,9 +341,9 @@ class OTV(models.Model):
 
 class Process(models.Model):
     increment_id = models.AutoField(primary_key=True)
-    created_at = models.CharField(max_length=50)
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(default=now, editable=False)
     started_at = models.CharField(max_length=50, null=True)
-    updated_at = models.CharField(max_length=50, null=True)
     finished_at = models.CharField(max_length=50, null=True)
     process_id = models.IntegerField(null=True)
     process_type = models.CharField(max_length=100)
@@ -384,10 +358,10 @@ class Process(models.Model):
 
 class ProcessLog(models.Model):
     increment_id = models.AutoField(primary_key=True)
-    created_at = models.CharField(max_length=20)
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(default=now, editable=False)
     job = models.CharField(max_length=50)
     status = models.CharField(max_length=10)
-    updated_at = models.CharField(max_length=20, null=True)
     finished_at = models.CharField(max_length=20, null=True)
     treated_objects = models.CharField(max_length=20, null=True)
 
@@ -398,8 +372,8 @@ class ProcessLog(models.Model):
 class ProcessTask(models.Model):
     increment_id = models.AutoField(primary_key=True)
     process = models.ForeignKey(Process, on_delete=models.CASCADE)
-    created_at = models.CharField(max_length=50)
-    updated_at = models.CharField(max_length=50, null=True)
+    created_at = models.DateTimeField(default=now, editable=False)
+    updated_at = models.DateTimeField(default=now, editable=False)
     finished_at = models.CharField(max_length=50, null=True)
     task = jsonfield.JSONField()
     system_process_id = models.IntegerField(null=True)
@@ -434,7 +408,7 @@ class RoleTitle(models.Model):
     title = models.CharField(max_length=50)
     allow_pw_change = models.BooleanField(default=False)
     complexity = models.IntegerField(default=0)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=0)
 
     class Meta:
         db_table = "roles_title"
@@ -455,7 +429,7 @@ class ShareKeyField(models.Model):
     object = models.ForeignKey(
         "Item", on_delete=models.CASCADE, related_name="share_key_fields"
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     share_key = models.TextField()
 
     class Meta:
@@ -465,7 +439,7 @@ class ShareKeyField(models.Model):
 class ShareKeyFile(models.Model):
     increment_id = models.AutoField(primary_key=True)
     object = models.ForeignKey(File, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     share_key = models.TextField()
 
     class Meta:
@@ -475,7 +449,7 @@ class ShareKeyFile(models.Model):
 class ShareKeyItem(models.Model):
     increment_id = models.AutoField(primary_key=True)
     object = models.ForeignKey("Item", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     share_key = models.TextField()
 
     class Meta:
@@ -485,7 +459,7 @@ class ShareKeyItem(models.Model):
 class ShareKeyLog(models.Model):
     increment_id = models.AutoField(primary_key=True)
     object = models.ForeignKey("Item", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     share_key = models.TextField()
 
     class Meta:
@@ -495,7 +469,7 @@ class ShareKeyLog(models.Model):
 class ShareKeySuggestion(models.Model):
     increment_id = models.AutoField(primary_key=True)
     object = models.ForeignKey("Suggestion", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     share_key = models.TextField()
 
     class Meta:
@@ -509,7 +483,7 @@ class Suggestion(models.Model):
     pw_iv = models.TextField()
     pw_len = models.IntegerField()
     description = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE)
     comment = models.TextField()
     suggestion_type = models.CharField(max_length=10, default="new")
@@ -539,7 +513,7 @@ class Template(models.Model):
 
 class Token(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     reason = models.CharField(max_length=255)
     creation_timestamp = models.CharField(max_length=50)
@@ -547,65 +521,3 @@ class Token(models.Model):
 
     class Meta:
         db_table = "tokens"
-
-
-class CustomUser(models.Model):
-    id = models.AutoField(primary_key=True)
-    login = models.CharField(max_length=500, unique=True)
-    pw = models.CharField(max_length=400)
-    visible_groups = models.CharField(max_length=1000)
-    last_items = models.TextField(null=True)
-    key_tempo = models.CharField(max_length=100, null=True)
-    last_pw_change = models.CharField(max_length=30, null=True)
-    last_pw = models.TextField(null=True)
-    admin = models.BooleanField(default=False)
-    functions = models.CharField(max_length=1000, null=True)
-    forbidden_groups = models.CharField(max_length=1000, null=True)
-    last_connection = models.CharField(max_length=30, null=True)
-    manager = models.IntegerField(default=0)
-    email = models.CharField(max_length=300, default="none")
-    favorites = models.CharField(max_length=1000, null=True)
-    latest_items = models.CharField(max_length=1000, null=True)
-    personal_folder = models.BooleanField(default=False)
-    disabled = models.BooleanField(default=False)
-    no_bad_attempts = models.BooleanField(default=False)
-    can_create_root_folder = models.BooleanField(default=False)
-    read_only = models.BooleanField(default=False)
-    timestamp = models.CharField(max_length=30, default="0")
-    language = models.CharField(max_length=50, default="0")
-    name = models.CharField(max_length=100, null=True)
-    lastname = models.CharField(max_length=100, null=True)
-    session_end = models.CharField(max_length=30, null=True)
-    is_administrated_by_role = models.BooleanField(default=False)
-    psk = models.CharField(max_length=400, null=True)
-    ga = models.CharField(max_length=50, null=True)
-    ga_temporary_code = models.CharField(max_length=20, default="none")
-    avatar = models.CharField(max_length=1000, null=True)
-    avatar_thumb = models.CharField(max_length=1000, null=True)
-    upgrade_needed = models.BooleanField(default=False)
-    tree_load_strategy = models.CharField(max_length=30, default="full")
-    can_manage_all_users = models.BooleanField(default=False)
-    timezone = models.CharField(max_length=50, default="not_defined")
-    agses_user_card_id = models.CharField(max_length=50, default="0")
-    encrypted_psk = models.TextField(null=True)
-    user_ip = models.CharField(max_length=400, default="none")
-    user_ip_lastdate = models.CharField(max_length=50, null=True)
-    yubico_user_key = models.CharField(max_length=100, default="none")
-    yubico_user_id = models.CharField(max_length=100, default="none")
-    public_key = models.TextField(null=True)
-    private_key = models.TextField(null=True)
-    special = models.CharField(max_length=250, default="none")
-    auth_type = models.CharField(max_length=200, default="local")
-    is_ready_for_usage = models.BooleanField(default=False)
-    otp_provided = models.BooleanField(default=False)
-    roles_from_ad_groups = models.CharField(max_length=1000, null=True)
-    ongoing_process_id = models.CharField(max_length=100, null=True)
-    mfa_enabled = models.BooleanField(default=True)
-    created_at = models.CharField(max_length=30, null=True)
-    updated_at = models.CharField(max_length=30, null=True)
-    deleted_at = models.CharField(max_length=30, null=True)
-    keys_recovery_time = models.CharField(max_length=500, null=True)
-    aes_iv = models.TextField(null=True)
-
-    class Meta:
-        db_table = "users"

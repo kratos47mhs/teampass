@@ -26,15 +26,15 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # Authentication URLs
     path("accounts/", include("django.contrib.auth.urls")),
-    path('login/', views.user_login, name='user_login'),
-    path('logout/', views.user_logout, name='user_logout'),
+    path("login/", views.user_login, name="user_login"),
+    path("logout/", views.user_logout, name="user_logout"),
     # App-specific URLs
     path("", views.home, name="home"),
-    path("items/", views.item_list, name="item_list"),
-    path("items/<int:pk>/", views.item_detail, name="item_detail"),
-    path("items/new/", views.item_create, name="item_create"),
-    path("items/<int:pk>/edit/", views.item_update, name="item_update"),
-    path("items/<int:pk>/delete/", views.item_delete, name="item_delete"),
+    path("item/", views.item_list, name="item_list"),
+    path("item/<int:pk>/", views.item_detail, name="item_detail"),
+    path("item/new/", views.item_create, name="item_create"),
+    path("item/<int:pk>/edit/", views.item_update, name="item_update"),
+    path("item/<int:pk>/delete/", views.item_delete, name="item_delete"),
     # Folder URLs
     path("folders/", views.folder_list, name="folder_list"),
     path("folders/<int:pk>/", views.folder_detail, name="folder_detail"),
@@ -42,15 +42,14 @@ urlpatterns = [
     path("folders/<int:pk>/edit/", views.folder_update, name="folder_update"),
     path("folders/<int:pk>/delete/", views.folder_delete, name="folder_delete"),
     # User URLs
-    path('register/', views.user_register, name='user_register'),
-    path('profile/', views.user_profile, name='user_profile'),
+    path("register/", views.user_register, name="user_register"),
+    path("profile/", views.user_profile, name="user_profile"),
     path("users/", views.user_list, name="user_list"),
     path("users/<int:pk>/", views.user_detail, name="user_detail"),
     path("users/new/", views.user_create, name="user_create"),
     path("users/<int:pk>/edit/", views.user_update, name="user_update"),
     path("users/<int:pk>/delete/", views.user_delete, name="user_delete"),
-    path('users/<int:pk>/edit/', views.user_update, name='user_update'),
-
+    path("users/<int:pk>/edit/", views.user_update, name="user_update"),
     # API URLs
     path("api/", include("manager.api.urls")),  # Assuming you have an API app
 ]

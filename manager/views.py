@@ -1,8 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from manager.models.models import Item, Folder, CustomUser
+from manager.models.models import Item, Folder
+from manager.models.user import CustomUser
 from .forms import ItemForm, FolderForm, CustomUserCreationForm
 
 
@@ -14,9 +18,9 @@ def home(request):
 # Item views
 @login_required
 def item_list(request):
-    items = Item.objects.filter(user=request.user)
+    item = Item.objects.filter(user=request.user)
     folders = Folder.objects.filter(user=request.user)
-    return render(request, "item_list.html", {"items": items})
+    return render(request, "item_list.html", {"item": item})
 
 
 @login_required
@@ -80,12 +84,33 @@ def folder_create(request):
         form = FolderForm(request.POST)
         if form.is_valid():
             folder = form.save(commit=False)
-            folder.user = request.user
+            folder.customuser = request.user
             folder.save()
             return redirect("folder_detail", pk=folder.pk)
     else:
         form = FolderForm()
     return render(request, "folder_form.html", {"form": form})
+
+
+@method_decorator(login_required, name="dispatch")
+class FolderCreateView(View):
+    def get(self, request):
+        # Render your form here
+        return render(request, "folders/new.html")
+
+    def post(self, request):
+        # Assuming you have a form to handle folder creation
+        title = request.POST.get("title")
+        parent_id = request.POST.get("parent_id")
+        parent = Folder.objects.get(id=parent_id) if parent_id else None
+
+        # Convert the User instance to CustomUser
+        custom_user = CustomUser.objects.get(id=request.user.id)
+
+        folder = Folder(title=title, parent=parent, user=custom_user)
+        folder.save()
+
+        return redirect("folders:list")
 
 
 @login_required
@@ -137,15 +162,17 @@ def user_create(request):
 
 @login_required
 def user_update(request, pk):
-    user = get_object_or_404(CustomUser, pk=pk)  # Retrieve the user or return a 404 error
-    if request.method == 'POST':
+    user = get_object_or_404(
+        CustomUser, pk=pk
+    )  # Retrieve the user or return a 404 error
+    if request.method == "POST":
         form = CustomUserCreationForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('user_detail', pk=user.pk)
+            return redirect("user_detail", pk=user.pk)
     else:
         form = CustomUserCreationForm(instance=user)
-    return render(request, 'user_form.html', {'form': form})
+    return render(request, "user_form.html", {"form": form})
 
 
 @login_required
@@ -169,17 +196,17 @@ def user_delete(request, pk):
 #         form = CustomUserCreationForm()
 #     return render(request, "register.html", {"form": form})
 
+
 def user_register(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)  # Log the user in after registration
-            return redirect('home')  # Redirect to the home page after registration
+            return redirect("home")  # Redirect to the home page after registration
     else:
         form = UserCreationForm()
-    return render(request, 'register.html', {'form': form})
-
+    return render(request, "register.html", {"form": form})
 
 
 def user_login(request):
